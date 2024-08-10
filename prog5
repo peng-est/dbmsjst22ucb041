@@ -1,0 +1,167 @@
+CREATE TABLE DEPARTMENT(
+    dno INT PRIMARY KEy,dname VARCHAR(20),mgrssn INT,mgrstartdate DATE, dloc VARCHAR(20)
+    );
+   CREATE TABLE PROJECT(
+     pno INT PRIMARY KEY, pname VARCHAR(20), plocation VARCHAR(20),dno INT,
+     FOREIGN KEY(dno) REFERENCES DEPARTMENT(dno)
+     ); 
+     CREATE TABLE EMPLOYEE(
+  ssn INT PRIMARY KEY, name VARCHAR(20), address VARCHAR(20), gender VARCHAR(20), salary INT, dno INT,
+  FOREIGN KEY(dno) REFERENCES DEPARTMENT(dno)
+);
+
+--- 09-08-2024 18:49:35
+--- MS SQL
+CREATE TABLE WORKSON(
+       ssn INT, pno INT, hours INT,
+       FOREIGN KEy (pno) REFERENCES PROJECT(pno),
+       FOREIGN KEY (ssn) REFERENCES EMPLOYEE(ssn)
+       );
+
+SELECT * FROM EMPLOYEE;
+
+SELECT * FROM DEPARTMENT;
+
+--- 09-08-2024 19:07:28
+--- MS SQL
+INSERT INTO DEPARTMENT VALUES(1,'DEP1',1,'2012-01-01','LOC1'),
+(2,'DEP2',2,'2012-01-01','LOC2'),
+(3,'DEP3',3,'2012-01-01','LOC3'),
+(4,'DEP4',4,'2012-01-01','LOC4'),
+(5,'DEP5',5,'2012-01-01','LOC5'),
+(6,'DEP6',6,'2012-01-01','LOC6'),
+(7,'DEP7',7,'2012-01-01','LOC7'),
+(8,'DEP8',8,'2012-01-01','LOC8');
+
+--- 09-08-2024 19:08:01
+--- MS SQL
+SELECT * FROM DEPARTMENT;
+
+--- 09-08-2024 19:08:12
+--- MS SQL
+INSERT INTO EMPLOYEE VALUES (1,'EMP1','ADD1','F',100000,1),
+(2,'EMP1','ADD13','F',700000,1),
+(3,'EMP2','ADD12','M',700000,1),
+(4,'EM3','ADD132','M',4000000,1),
+(5,'EMP31','ADD132','F',900000,1),
+(6,'EMP12','ADD14','F',700000,1),
+(7,'EMP13','ADD13','F',900000,5),
+(8,'EMP14','ADD11','M',1000000,5),
+(9,'EMP143','ADD15','F',700000,5);
+
+--- 09-08-2024 19:12:34
+--- MS SQL
+INSERT INTO PROJECT VALUES(1,'PRJ1','PLOC1',1),
+(2,'PRJ2','PLOC2',5),
+(3,'PRJ3','PLOC3',5);
+
+--- 09-08-2024 19:12:42
+--- MS SQL
+INSERT INTO WORKSON VALUES(1,1,2),
+(1,2,3),
+(1,3,2),
+(2,1,2),
+(2,2,2),
+(2,3,2),
+(3,1,2),
+(4,2,2);
+
+--- 09-08-2024 19:12:59
+--- MS SQL
+SELECT W.pno 
+FROM WORKSON W, EMPLOYEE E
+WHERE W.ssn = E.ssn;
+
+--- 09-08-2024 19:13:26
+--- MS SQL
+SELECT W.pno, E.name
+FROM WORKSON W, EMPLOYEE E
+WHERE W.ssn = E.ssn AND E.name LIKE '%1';
+
+--- 09-08-2024 19:19:19
+--- MS SQL
+SELECT w.ssn,e.name, p.pname, e.salary
+FROM EMPLOYEE e, PROJECT p, WORKSON w
+WHERE w.pno = p.pno AND w.ssn = e.ssn AND p.pname = 'PRJ1';
+
+--- 09-08-2024 19:19:39
+--- MS SQL
+SELECT w.ssn,e.name, p.pname, e.salary*1.1
+FROM EMPLOYEE e, PROJECT p, WORKSON w
+WHERE w.pno = p.pno AND w.ssn = e.ssn AND p.pname = 'PRJ1';
+
+--- 09-08-2024 19:22:15
+--- MS SQL
+SELECT d.dname,SUM(e.salary) as sum_sal, AVG(e.salary) AS avg_sal, MIN(e.salary) AS min_sal, MAX(e.salary) AS max_sal
+FROM EMPLOYEE e, DEPARTMENT d
+WHERE e.dno = d.dno AND d.dname = 'DEP1'
+GROUP BY d.dname;
+
+--- 09-08-2024 19:22:25
+--- MS SQL
+SELECT d.dname,SUM(e.salary) as sum_sal, AVG(e.salary) AS avg_sal, MIN(e.salary) AS min_sal, MAX(e.salary) AS max_sal
+FROM EMPLOYEE e, DEPARTMENT d
+WHERE e.dno = d.dno AND d.dname = 'DEP5'
+GROUP BY d.dname;
+
+--- 09-08-2024 19:22:31
+--- MS SQL
+SELECT d.dname,SUM(e.salary) as sum_sal, AVG(e.salary) AS avg_sal, MIN(e.salary) AS min_sal, MAX(e.salary) AS max_sal
+FROM EMPLOYEE e, DEPARTMENT d
+WHERE e.dno = d.dno AND d.dname = 'DEP1'
+GROUP BY d.dname;
+
+--- 09-08-2024 19:23:31
+--- MS SQL
+SELECT e.dno, count(e.ssn)
+FROM EMPLOYEE e 
+WHERE salary>600000
+GROUP by e.dno
+HAVING COUNT(e.ssn)>5;
+
+--- 09-08-2024 19:23:40
+--- MS SQL
+SELECT e.dno, count(e.ssn)
+FROM EMPLOYEE e 
+WHERE salary>600000
+GROUP by e.dno
+HAVING COUNT(e.ssn)>4;
+
+--- 09-08-2024 20:03:01
+
+
+--- 09-08-2024 20:03:11
+--- MS SQL
+SELECT E.Name
+FROM EMPLOYEE E
+WHERE NOT EXISTS (
+    SELECT P.PNo
+    FROM PROJECT P
+    WHERE P.DNo = 5
+    AND NOT IN (
+        SELECT W.PNo
+        FROM WORKSON W
+        WHERE W.SSN = E.SSN
+    )
+);
+
+
+--- 09-08-2024 20:04:29
+--- MS SQL
+SELECT DISTINCT(E.Name)
+FROM EMPLOYEE E
+WHERE NOT EXISTS (
+    SELECT P.PNo
+    FROM PROJECT P
+    WHERE P.DNo = 5
+    AND NOT EXISTS (
+        SELECT W.PNo
+        FROM WORKSON W
+        WHERE W.SSN = E.SSN
+        AND W.PNo = P.PNo
+    )
+);
+
+--- 09-08-2024 20:05:22
+--- MS SQL
+SELECT * FROM EMPLOYEE;
